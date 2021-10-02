@@ -4,8 +4,8 @@
 
 int main()
 {
-	const int arr_len = 29;
-	int a[arr_len] = { 9,8,7,6,1,2,3,4,5 ,11,13,15,17,19,12,14,16,20,18,23,21,25,29,27,22,24,26,28,30 };
+	const int arr_len = 6;
+	int a[arr_len] = { 5,16,4,3,5,10 };
 	//int a[4] = { 3,4, 2, 1 };
 
 	//const int arr_len = 1;
