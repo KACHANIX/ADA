@@ -193,18 +193,18 @@ public:
 			}
 
 			//confirm the order
-			std::cout << "Повелитель, приказ сформирован, подпишешь ли ты его? Если нет, то создадим новый. (да/нет)";
+			std::cout << "Повелитель, приказ сформирован, подпишешь ли ты его? Если нет, то создадим новый. (yes/no)";
 			while (true)
 			{
 				std::cin >> input_string;
-				if (input_string == "да" || input_string == "нет")
+				if (input_string == "yes" || input_string == "no")
 				{
 					break;
 				}
 				std::cout << "Повелитель, это невозможно. Повтори, пожалуйста: ";
 			}
 
-			if (input_string == "да")
+			if (input_string == "yes")
 				break;
 		}
 
