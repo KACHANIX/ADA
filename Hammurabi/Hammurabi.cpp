@@ -5,16 +5,18 @@
 #include <iostream>
 #include <cctype>
 #include <Windows.h>
-
+#include <fstream>
 #include <cstdlib>
 #include <random>
 #include <string>
+#include <format>
+#include <regex>
 
 
-bool TryParseInt(const std::string& in_value, int& out_value)
+bool TryParsePositiveInt(const std::string& in_value, int& out_value)
 {
 	// check if string contains any non-digit symbols
-	if (!std::all_of(in_value.begin(), in_value.end(), ::isdigit))
+	if (!std::all_of(in_value.begin(), in_value.end(), isdigit))
 	{
 		return false;
 	}
@@ -22,6 +24,25 @@ bool TryParseInt(const std::string& in_value, int& out_value)
 	try
 	{
 		out_value = std::stoi(in_value);
+		return true;
+	}
+	catch (std::out_of_range) // if input value doesn't fit in integer
+	{
+		return false;
+	}
+}
+
+bool TryParsePositiveDouble(const std::string& in_value, double& out_value)
+{
+	std::regex double_expr("(0|([1-9][0-9]*))(\\,[0-9]+)?$");
+	if (!std::regex_match(in_value, double_expr))
+	{
+		return false;
+	}
+
+	try
+	{
+		out_value = std::stod(in_value);
 		return true;
 	}
 	catch (std::out_of_range) // if input value doesn't fit in integer
@@ -53,11 +74,12 @@ private:
 	int harvest_from_acre;
 
 	double yearly_starved_;
-	void GeneratePrice()
+
+	int GeneratePrice()
 	{
 		std::mt19937 gen(time(0));
 		std::uniform_int_distribution<> uid(17, 26);
-		price_ = uid(gen);
+		return uid(gen);
 	}
 public:
 
@@ -69,14 +91,180 @@ public:
 		year_ = 1;
 
 		harvest_ = 0;
-		harvested_acres_ = 1;
 		starved_people_ = 0;
 		new_people_ = 0;
 		bushels_destroyed_ = 0;
-		harvest_from_acre = 0;
+		price_ = GeneratePrice();
 		plague_ = false;
+
+		acres_to_buy_ = 0;
+		acres_to_sell_ = 0;
+		bushels_to_eat_ = 0;
+		acres_to_sow_ = 0;
+		harvested_acres_ = 1;
+		harvest_from_acre = 0;
 		yearly_starved_ = 0;
-		GeneratePrice();
+	}
+
+	std::string ToString()
+	{
+		return std::to_string(population_) + "\n" + std::to_string(bushels_) + "\n" + std::to_string(acres_) + "\n" +
+			std::to_string(year_) + "\n" + std::to_string(harvest_) + "\n" + std::to_string(starved_people_) + "\n" +
+			std::to_string(new_people_) + "\n" + std::to_string(bushels_destroyed_) + "\n" + std::to_string(price_) + "\n" +
+			std::to_string(acres_to_buy_) + "\n" + std::to_string(acres_to_sell_) + "\n" + std::to_string(bushels_to_eat_) + "\n" +
+			std::to_string(acres_to_sow_) + "\n" + std::to_string(harvested_acres_) + "\n" + std::to_string(harvest_from_acre) + "\n" +
+			std::to_string(yearly_starved_) + "\n" + std::to_string(plague_);
+	}
+
+	bool SaveState()
+	{
+		std::string input_string;
+
+		//confirm the order
+		std::cout << "\nПовелитель, хочешь ли ты прерваться и отдохнуть? (y/n)";
+		while (true)
+		{
+			std::cin >> input_string;
+			if (input_string == "y" || input_string == "n")
+			{
+				break;
+			}
+			std::cout << "Повелитель, не могу расслышать. Повтори, пожалуйста: ";
+		}
+
+		if (input_string == "y")
+		{
+			std::ofstream save_file("savefile.txt");
+			save_file << ToString();
+			save_file.close();
+			return true;
+		}
+
+		return false;
+	}
+
+	void LoadState()
+	{
+		std::string input_string;
+		std::cout << "Загрузить сохраненную ранее игру? (y/n)";
+		while (true)
+		{
+			std::cin >> input_string;
+			if (input_string == "y" || input_string == "n")
+			{
+				break;
+			}
+			std::cout << "Повтори, пожалуйста: ";
+		}
+		if (input_string == "n")
+		{
+			return;
+		}
+
+		std::ifstream save_file("savefile.txt");
+		if (!save_file)
+		{
+			save_file.close();
+			std::cout << "Данных о сохраненной игре не найдено. Начинаем новую игру.";
+			return;
+		}
+
+		std::string tmp;
+		int tmp_int_arr[15];
+
+		double tmp_starved;
+		bool tmp_plague;
+
+		// check input file
+		for (int i = 0; i < 15; i++)
+		{
+			std::getline(save_file, tmp);
+			if (tmp.empty())
+			{
+				std::cout << "Файл сохранений поврежден. Начинаем новую игру.";
+				return;
+			}
+			if (!TryParsePositiveInt(tmp, tmp_int_arr[i]))
+			{
+				std::cout << "Файл сохранений поврежден. Начинаем новую игру.";
+				return;
+			}
+		}
+		std::getline(save_file, tmp);
+		if (!TryParsePositiveDouble(tmp, tmp_starved))
+		{
+			std::cout << "Файл сохранений поврежден. Начинаем новую игру.";
+			return;
+		}
+		std::getline(save_file, tmp);
+		if (tmp != "0" && tmp != "1")
+		{
+			std::cout << "Файл сохранений поврежден. Начинаем новую игру.";
+			return;
+		}
+		tmp_plague = tmp == "1";
+
+		// set savefile data
+		for (int i = 0; i < 17; i++)
+		{
+			switch (i)
+			{
+			case 0:
+				population_ = tmp_int_arr[i];
+				break;
+			case 1:
+				bushels_ = tmp_int_arr[i];
+				break;
+			case 2:
+				acres_= tmp_int_arr[i];
+				break;
+			case 3:
+				year_ = tmp_int_arr[i];
+				break;
+			case 4:
+				harvest_ = tmp_int_arr[i];
+				break;
+			case 5:
+				starved_people_ = tmp_int_arr[i];
+				break;
+			case 6:
+				new_people_ = tmp_int_arr[i];
+				break;
+			case 7:
+				bushels_destroyed_ = tmp_int_arr[i];
+				break;
+			case 8:
+				 price_ = tmp_int_arr[i];
+				break;
+			case 9:
+				acres_to_buy_ = tmp_int_arr[i];
+				break;
+			case 10:
+				acres_to_sell_ = tmp_int_arr[i];
+				break;
+			case 11:
+				bushels_to_eat_ = tmp_int_arr[i];
+				break;
+			case 12:
+				acres_to_sow_ = tmp_int_arr[i];
+				break;
+			case 13:
+				harvested_acres_ = tmp_int_arr[i];
+				break;
+			case 14:
+				harvest_from_acre = tmp_int_arr[i];
+				break;
+			case 15:
+				yearly_starved_ = tmp_starved;
+				break;
+			case 16:
+				plague_ = tmp_plague;
+				break;
+			default:
+				break;
+			}
+		}
+		save_file.close();
 	}
 
 	bool CheckLoss() {
@@ -184,7 +372,7 @@ public:
 		population_ += new_people_;
 
 		// next year 
-		GeneratePrice();
+		price_ = GeneratePrice();
 		year_++;
 	}
 
@@ -226,7 +414,7 @@ public:
 			while (true)
 			{
 				std::cin >> input_string;
-				if (!TryParseInt(input_string, acres_to_buy_))
+				if (!TryParsePositiveInt(input_string, acres_to_buy_))
 				{
 					std::cout << "Повелитель, это невозможно. Повтори, пожалуйста: ";
 					continue;
@@ -245,7 +433,7 @@ public:
 			while (true)
 			{
 				std::cin >> input_string;
-				if (!TryParseInt(input_string, acres_to_sell_))
+				if (!TryParsePositiveInt(input_string, acres_to_sell_))
 				{
 					std::cout << "Повелитель, это невозможно. Повтори, пожалуйста: ";
 					continue;
@@ -264,7 +452,7 @@ public:
 			while (true)
 			{
 				std::cin >> input_string;
-				if (!TryParseInt(input_string, bushels_to_eat_))
+				if (!TryParsePositiveInt(input_string, bushels_to_eat_))
 				{
 					std::cout << "Повелитель, это невозможно. Повтори, пожалуйста: ";
 					continue;
@@ -283,7 +471,7 @@ public:
 			while (true)
 			{
 				std::cin >> input_string;
-				if (!TryParseInt(input_string, acres_to_sow_))
+				if (!TryParsePositiveInt(input_string, acres_to_sow_))
 				{
 					std::cout << "Повелитель, это невозможно. Повтори, пожалуйста: ";
 					continue;
@@ -306,7 +494,7 @@ public:
 				{
 					break;
 				}
-				std::cout << "Повелитель, это невозможно. Повтори, пожалуйста: ";
+				std::cout << "Повелитель, не могу расслышать. Повтори, пожалуйста: ";
 			}
 
 			if (input_string == "y")
@@ -321,15 +509,21 @@ int main()
 {
 	setlocale(LC_ALL, "Russian");
 	SetConsoleOutputCP(1251);
-	std::string input = "2147483647";
+	std::string input = "0,5";
 	int input_int = 0;
-
+	double asd = 0;
+	TryParsePositiveDouble(input, asd);
 	Babylon babylon;
+	babylon.LoadState();
 
 	while (true)
 	{
 		babylon.PrintYearReport();
 		if (babylon.CheckLastYear())
+		{
+			break;
+		}
+		if (babylon.SaveState())
 		{
 			break;
 		}
