@@ -205,65 +205,24 @@ public:
 		tmp_plague = tmp == "1";
 
 		// set savefile data
-		for (int i = 0; i < 17; i++)
-		{
-			switch (i)
-			{
-			case 0:
-				population_ = tmp_int_arr[i];
-				break;
-			case 1:
-				bushels_ = tmp_int_arr[i];
-				break;
-			case 2:
-				acres_= tmp_int_arr[i];
-				break;
-			case 3:
-				year_ = tmp_int_arr[i];
-				break;
-			case 4:
-				harvest_ = tmp_int_arr[i];
-				break;
-			case 5:
-				starved_people_ = tmp_int_arr[i];
-				break;
-			case 6:
-				new_people_ = tmp_int_arr[i];
-				break;
-			case 7:
-				bushels_destroyed_ = tmp_int_arr[i];
-				break;
-			case 8:
-				 price_ = tmp_int_arr[i];
-				break;
-			case 9:
-				acres_to_buy_ = tmp_int_arr[i];
-				break;
-			case 10:
-				acres_to_sell_ = tmp_int_arr[i];
-				break;
-			case 11:
-				bushels_to_eat_ = tmp_int_arr[i];
-				break;
-			case 12:
-				acres_to_sow_ = tmp_int_arr[i];
-				break;
-			case 13:
-				harvested_acres_ = tmp_int_arr[i];
-				break;
-			case 14:
-				harvest_from_acre = tmp_int_arr[i];
-				break;
-			case 15:
-				yearly_starved_ = tmp_starved;
-				break;
-			case 16:
-				plague_ = tmp_plague;
-				break;
-			default:
-				break;
-			}
-		}
+
+		population_ = tmp_int_arr[0];
+		bushels_ = tmp_int_arr[1];
+		acres_ = tmp_int_arr[2];
+		year_ = tmp_int_arr[4];
+		harvest_ = tmp_int_arr[4];
+		starved_people_ = tmp_int_arr[5];
+		new_people_ = tmp_int_arr[6];
+		bushels_destroyed_ = tmp_int_arr[7];
+		price_ = tmp_int_arr[8];
+		acres_to_buy_ = tmp_int_arr[9];
+		acres_to_sell_ = tmp_int_arr[10];
+		bushels_to_eat_ = tmp_int_arr[11];
+		acres_to_sow_ = tmp_int_arr[12];
+		harvested_acres_ = tmp_int_arr[13];
+		harvest_from_acre = tmp_int_arr[14];
+		yearly_starved_ = tmp_starved;
+		plague_ = tmp_plague;
 		save_file.close();
 	}
 
@@ -280,7 +239,7 @@ public:
 
 	bool CheckLastYear()
 	{
-		if (year_ == 11)
+		if (year_ >= 11)
 		{
 			yearly_starved_ /= 10;
 			int acres_per_human = population_ / acres_;
