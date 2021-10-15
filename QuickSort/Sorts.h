@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stack>
+
+#define INSERTION_ELEMENTS 10
 template<typename T>
 void swap(T* a, T* b)
 {
@@ -26,14 +28,26 @@ void StartSort(T* first, T* middle, T* last, Compare comp)
 	}
 }
 
-template <typename T, typename Compare>
-void InsertionSortOn2(T* first, T* last, Compare comp)
+template<typename T, typename Compare>
+void InsertionSort(T* first, T* last, Compare comp)
 {
-	if (!comp(*first, *last)) // "insertion" sort on 2 elements
+	if (last == first)
 	{
-		swap(first, last);
+		return;
+	} 
+	for (int i = 1; i <= last - first; i++)
+	{
+		for (int j = i; j > 0; j--)
+		{ 
+			if (comp(*(first + j - 1), *(first + j)))
+			{
+				break;
+			}
+			swap((first + j - 1), (first + j));
+		}
 	}
-}
+
+} 
 
 template<typename T, typename Compare>
 T* Partition(T* first, T* pivot_element, T* last, Compare comp)
@@ -59,11 +73,12 @@ T* Partition(T* first, T* pivot_element, T* last, Compare comp)
 	}
 	return pivot_element;
 }
+
 template<typename T, typename Compare>
 void QSort(T* first, T* last, Compare comp)
 {
 	if (first == last) return; // if array has only 1 element
-	if (last - first != 1)
+	if (last - first > INSERTION_ELEMENTS - 1)
 	{
 		T* pivot_element = Partition(first, (first + (last - first) / 2), last, comp);
 		T* iter_first;
@@ -93,7 +108,7 @@ void QSort(T* first, T* last, Compare comp)
 			iter_last = stack.top(); stack.pop();
 			iter_first = stack.top(); stack.pop();
 
-			if (iter_last - iter_first != 1)
+			if (iter_last - iter_first > INSERTION_ELEMENTS - 1)
 			{
 				T* iter_pivot = Partition(iter_first, (iter_first + (iter_last - iter_first) / 2), iter_last, comp);
 				if (iter_pivot - iter_first > 1)
@@ -109,13 +124,13 @@ void QSort(T* first, T* last, Compare comp)
 			}
 			else
 			{
-				InsertionSortOn2(iter_first, iter_last, comp);
+				InsertionSort(iter_first, iter_last, comp);
 			}
 		}
 	}
 	else
 	{
-		InsertionSortOn2(first, last, comp);
+		InsertionSort(first, last, comp);
 	}
 }
 

@@ -71,7 +71,7 @@ private:
 	int bushels_to_eat_;
 	int acres_to_sow_;
 	int harvested_acres_;
-	int harvest_from_acre;
+	int harvest_from_acre_;
 
 	double yearly_starved_;
 
@@ -80,6 +80,16 @@ private:
 		std::mt19937 gen(time(0));
 		std::uniform_int_distribution<> uid(17, 26);
 		return uid(gen);
+	}
+
+	std::string ToString()
+	{
+		return std::to_string(population_) + "\n" + std::to_string(bushels_) + "\n" + std::to_string(acres_) + "\n" +
+			std::to_string(year_) + "\n" + std::to_string(harvest_) + "\n" + std::to_string(starved_people_) + "\n" +
+			std::to_string(new_people_) + "\n" + std::to_string(bushels_destroyed_) + "\n" + std::to_string(price_) + "\n" +
+			std::to_string(acres_to_buy_) + "\n" + std::to_string(acres_to_sell_) + "\n" + std::to_string(bushels_to_eat_) + "\n" +
+			std::to_string(acres_to_sow_) + "\n" + std::to_string(harvested_acres_) + "\n" + std::to_string(harvest_from_acre_) + "\n" +
+			std::to_string(yearly_starved_) + "\n" + std::to_string(plague_);
 	}
 public:
 
@@ -102,19 +112,10 @@ public:
 		bushels_to_eat_ = 0;
 		acres_to_sow_ = 0;
 		harvested_acres_ = 1;
-		harvest_from_acre = 0;
+		harvest_from_acre_ = 0;
 		yearly_starved_ = 0;
 	}
 
-	std::string ToString()
-	{
-		return std::to_string(population_) + "\n" + std::to_string(bushels_) + "\n" + std::to_string(acres_) + "\n" +
-			std::to_string(year_) + "\n" + std::to_string(harvest_) + "\n" + std::to_string(starved_people_) + "\n" +
-			std::to_string(new_people_) + "\n" + std::to_string(bushels_destroyed_) + "\n" + std::to_string(price_) + "\n" +
-			std::to_string(acres_to_buy_) + "\n" + std::to_string(acres_to_sell_) + "\n" + std::to_string(bushels_to_eat_) + "\n" +
-			std::to_string(acres_to_sow_) + "\n" + std::to_string(harvested_acres_) + "\n" + std::to_string(harvest_from_acre) + "\n" +
-			std::to_string(yearly_starved_) + "\n" + std::to_string(plague_);
-	}
 
 	bool SaveState()
 	{
@@ -209,7 +210,7 @@ public:
 		population_ = tmp_int_arr[0];
 		bushels_ = tmp_int_arr[1];
 		acres_ = tmp_int_arr[2];
-		year_ = tmp_int_arr[4];
+		year_ = tmp_int_arr[3];
 		harvest_ = tmp_int_arr[4];
 		starved_people_ = tmp_int_arr[5];
 		new_people_ = tmp_int_arr[6];
@@ -220,7 +221,7 @@ public:
 		bushels_to_eat_ = tmp_int_arr[11];
 		acres_to_sow_ = tmp_int_arr[12];
 		harvested_acres_ = tmp_int_arr[13];
-		harvest_from_acre = tmp_int_arr[14];
+		harvest_from_acre_ = tmp_int_arr[14];
 		yearly_starved_ = tmp_starved;
 		plague_ = tmp_plague;
 		save_file.close();
@@ -283,16 +284,16 @@ public:
 		// harvest by alive people
 		std::mt19937 gen(time(0));
 		std::uniform_int_distribution<> hid(1, 6);
-		harvest_from_acre = hid(gen);
+		harvest_from_acre_ = hid(gen);
 		int max_harvested_acres = (population_ - starved_people_) * 10;
 		if (max_harvested_acres > acres_to_sow_)
 		{
-			harvest_ = acres_to_sow_ * harvest_from_acre;
+			harvest_ = acres_to_sow_ * harvest_from_acre_;
 			harvested_acres_ = acres_to_sow_;
 		}
 		else
 		{
-			harvest_ = max_harvested_acres * harvest_from_acre;
+			harvest_ = max_harvested_acres * harvest_from_acre_;
 			harvested_acres_ = max_harvested_acres;
 		}
 		bushels_ += harvest_;
@@ -315,7 +316,7 @@ public:
 		}
 
 		// newcomers
-		int newcomers = starved_people_ / 2 + (5 - harvest_from_acre) * bushels_ / 600 + 1;
+		int newcomers = starved_people_ / 2 + (5 - harvest_from_acre_) * bushels_ / 600 + 1;
 		if (newcomers <= 0)
 		{
 			new_people_ = 0;
@@ -356,7 +357,7 @@ public:
 			std::cout << "\n\t" << "Чума обошла наш город стороной;";
 		}
 		std::cout << "\n\tНаселение города составляет " << population_ << " человек;";
-		std::cout << "\n\tМы собрали " << harvest_ << " бушелей пшеницы, по " << harvest_from_acre << " бушеля с акра;";
+		std::cout << "\n\tМы собрали " << harvest_ << " бушелей пшеницы, по " << harvest_from_acre_ << " бушеля с акра;";
 		std::cout << "\n\tКрысы истребили " << bushels_destroyed_ << " бушелей пшеницы, оставив " << bushels_ << " бушеля в амбарах; ";
 		std::cout << "\n\tГород сейчас занимает " << acres_ << " акров;";
 		std::cout << "\n\tЦена одного акра составляет " << price_ << " бушелей.";
@@ -467,11 +468,7 @@ public:
 int main()
 {
 	setlocale(LC_ALL, "Russian");
-	SetConsoleOutputCP(1251);
-	std::string input = "0,5";
-	int input_int = 0;
-	double asd = 0;
-	TryParsePositiveDouble(input, asd);
+	SetConsoleOutputCP(1251); 
 	Babylon babylon;
 	babylon.LoadState();
 

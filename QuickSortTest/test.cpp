@@ -74,7 +74,7 @@ TEST(CorrectAlgorithm, ArrayOf1)
 
 
 TEST(CorrectAlgorithm, ArrayOf2)
-{ // check that so called "insertion sort" on 2 elements  work properly
+{ 
 	const int arr_len = 2;
 	int a[arr_len] = { 9,0 };
 	auto comp = [](int a, int b) { return a < b; };
