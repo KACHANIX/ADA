@@ -116,7 +116,6 @@ public:
 		yearly_starved_ = 0;
 	}
 
-
 	bool SaveState()
 	{
 		std::string input_string;
@@ -462,7 +461,6 @@ public:
 		}
 	}
 };
-
 
 
 int main()

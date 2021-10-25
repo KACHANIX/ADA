@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuickSortTest", "QuickSortT
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hammurabi", "Hammurabi\Hammurabi.vcxproj", "{3A9F478B-57C4-4062-8935-9ABBC051E12E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DynamicArray", "DynamicArray\DynamicArray.vcxproj", "{8D027C78-5D83-4365-AA85-15D1A77AADDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{3A9F478B-57C4-4062-8935-9ABBC051E12E}.Release|x64.Build.0 = Release|x64
 		{3A9F478B-57C4-4062-8935-9ABBC051E12E}.Release|x86.ActiveCfg = Release|Win32
 		{3A9F478B-57C4-4062-8935-9ABBC051E12E}.Release|x86.Build.0 = Release|Win32
+		{8D027C78-5D83-4365-AA85-15D1A77AADDA}.Debug|x64.ActiveCfg = Debug|x64
+		{8D027C78-5D83-4365-AA85-15D1A77AADDA}.Debug|x64.Build.0 = Debug|x64
+		{8D027C78-5D83-4365-AA85-15D1A77AADDA}.Debug|x86.ActiveCfg = Debug|Win32
+		{8D027C78-5D83-4365-AA85-15D1A77AADDA}.Debug|x86.Build.0 = Debug|Win32
+		{8D027C78-5D83-4365-AA85-15D1A77AADDA}.Release|x64.ActiveCfg = Release|x64
+		{8D027C78-5D83-4365-AA85-15D1A77AADDA}.Release|x64.Build.0 = Release|x64
+		{8D027C78-5D83-4365-AA85-15D1A77AADDA}.Release|x86.ActiveCfg = Release|Win32
+		{8D027C78-5D83-4365-AA85-15D1A77AADDA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
