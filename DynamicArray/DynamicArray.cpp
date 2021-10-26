@@ -136,8 +136,7 @@ public:
 
 		if (index > capacity_)
 		{
-			Resize(true, index);
-			last_el_index_ = index;
+			Resize(true, index); 
 			first_null_index = index;
 		}
 		else if (no_nulls_after_index)
@@ -203,28 +202,17 @@ int main()
 	govno.Insert(22, ++a);
 	govno.Insert(23, ++a);
 	govno.Insert(24, ++a);
-
-	for (int i = 0; i < 32; i++)
-	{
-		std::cout << i << ": " << govno[i] << std::endl;
-	}
-	std::cout << std::endl;
-
 	govno.Insert(24, ++a);
-
-	for (int i = 0; i < 32; i++)
-	{
-		std::cout << i << ": " << govno[i] << std::endl;
-	}
-
 	govno.Insert(++a);
 
+	govno.Insert(27, ++a);
+
 
 	for (int i = 0; i < 32; i++)
 	{
 		std::cout << i << ": " << govno[i] << std::endl;
 	}
-	//std::cout << std::endl << govno[25] << std::endl;
+	 
 	std::cout << govno.Size();
 
 }
