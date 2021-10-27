@@ -98,31 +98,6 @@ public:
 
 		bool hasNext() const
 		{ // true if there is a next element
-			if (index == -1)
-			{
-				return false;
-			}
-			if (is_forward_)
-			{
-				for (int i = index + 1; i < parent_->capacity_; i++)
-				{
-					if (parent_->arr_[i] != NULL)
-					{
-						return true;
-					}
-				}
-			}
-			else
-			{
-				for (int i = index - 1; i >= 0; i--)
-				{
-					if (parent_->arr_[i] != NULL)
-					{
-						return true;
-					}
-				}
-			}
-
 			return !last_element_;
 		}
 	};
@@ -328,6 +303,15 @@ int main()
 	{
 		std::cout << i << ": " << govno[i] << std::endl;
 	}
+
+	int asd = 5;
+	int* das = &asd;
+	*das = 6;
+	int** ddads = &das;
+	**ddads = 7;
+	 
+	
+	std::cout << "dermo";
 	//Array<int> govno;
 	//for (int i = 1; i < 15; i++)
 	//{
