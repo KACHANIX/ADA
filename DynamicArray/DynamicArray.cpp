@@ -11,25 +11,119 @@ private:
 public:
 	class Iterator
 	{
+	private:
+		int index = -1;
+		bool is_forward_;
+		Array<T>* parent_;
+		bool last_element_ = false;
 	public:
+		Iterator(bool is_forward, Array<T>* parent)
+		{
+			parent_ = parent;
+			is_forward_ = is_forward;
+			if (is_forward)
+			{
+				for (int i = 0; i < parent_->capacity_; i++)
+				{
+					if (parent_->arr_[i] != NULL)
+					{
+						index = i;
+						return;
+					}
+				}
+			}
+			else
+			{
+				for (int i = parent_->capacity_ - 1; i >= 0; --i)
+				{
+					if (parent_->arr_[i] != NULL)
+					{
+						index = i;
+						return;
+					}
+				}
+			}
+
+		}
+
 		const T& Get() const
 		{ // current value in array
-
+			if (index == -1)
+			{
+				return NULL;
+			}
+			return parent_->arr_[index];
 		}
 
 		void Set(const T& value)
 		{ // set current value in array
-
+			if (index == -1)
+			{
+				return;
+			}
+			parent_->arr_[index] = value;
 		}
 
 		void Next()
 		{ // move to next element
+			if (index == -1)
+			{
+				return;
+			}
+			if (is_forward_)
+			{
+				for (int i = index + 1; i < parent_->capacity_; i++)
+				{
+					if (parent_->arr_[i] != NULL)
+					{
+						index = i;
+						return;
+					}
 
+				}
+			}
+			else
+			{
+				for (int i = index - 1; i >= 0; i--)
+				{
+					if (parent_->arr_[i] != NULL)
+					{
+						index = i;
+						return;
+					}
+				}
+			}
+			last_element_ = true;
 		}
 
 		bool hasNext() const
 		{ // true if there is a next element
+			if (index == -1)
+			{
+				return false;
+			}
+			if (is_forward_)
+			{
+				for (int i = index + 1; i < parent_->capacity_; i++)
+				{
+					if (parent_->arr_[i] != NULL)
+					{
+						return true;
+					}
+				}
+			}
+			else
+			{
+				for (int i = index - 1; i >= 0; i--)
+				{
+					if (parent_->arr_[i] != NULL)
+					{
+						return true;
+					}
+				}
+			}
 
+			return !last_element_;
 		}
 	};
 
@@ -69,7 +163,6 @@ public:
 		}
 		free(arr_);
 	}
-
 
 	void Resize(bool is_upsize, int target_index)
 	{
@@ -117,7 +210,6 @@ public:
 		return last_el_index_;
 	}
 
-
 	int Insert(int index, const T& value)
 	{
 		if (index < 0) return -1; // if index incorrect
@@ -136,7 +228,7 @@ public:
 
 		if (index > capacity_)
 		{
-			Resize(true, index); 
+			Resize(true, index);
 			first_null_index = index;
 		}
 		else if (no_nulls_after_index)
@@ -144,7 +236,6 @@ public:
 			Resize(true, index);
 			first_null_index = last_el_index_ + 1;
 		}
-
 
 		T previous_value = value;
 		T tmp_value;
@@ -162,7 +253,33 @@ public:
 
 	void Remove(int index)
 	{
+		if (index > last_el_index_ || index < 0 || arr_[index] == NULL)
+		{
+			return;
+		}
 
+		T previous_value = NULL;
+		T tmp_value;
+		for (int i = last_el_index_; i >= index; i--)
+		{
+			tmp_value = arr_[i];
+			arr_[i] = previous_value;
+			previous_value = tmp_value;
+		}
+
+		for (int i = last_el_index_ - 1; i >= 0; i--)
+		{
+			if (arr_[i] != NULL)
+			{
+				last_el_index_ = i;
+				break;
+			}
+			if (i == 0 && arr_[i] == NULL)
+			{
+				last_el_index_ = -1;
+			}
+		}
+		size--;
 	}
 
 	T& operator[](int index)
@@ -177,12 +294,12 @@ public:
 
 	Iterator iterator()
 	{
-
+		return Iterator(true, this);
 	}
 
 	Iterator reverseIterator()
 	{
-
+		return Iterator(false, this);
 	}
 };
 
@@ -190,29 +307,54 @@ public:
 int main()
 {
 	Array<int> govno;
-
-	for (int i = 1; i < 15; i++)
-	{
-		govno.Insert(i);
-	}
-	int a = 228;
-	govno.Insert(25, a);
-	govno.Insert(20, ++a);
-	govno.Insert(21, ++a);
-	govno.Insert(22, ++a);
-	govno.Insert(23, ++a);
-	govno.Insert(24, ++a);
-	govno.Insert(24, ++a);
+	int a = 0;
 	govno.Insert(++a);
+	govno.Insert(++a);
+	govno.Insert(++a);
+	govno.Insert(++a);
+	govno.Insert(++a);
+	govno.Insert(7, ++a);
+	govno.Remove(4);
 
-	govno.Insert(27, ++a);
+
+	for (auto it = govno.iterator(); it.hasNext(); it.Next())
+	{
+		it.Set(a);
+		std::cout << it.Get() << std::endl;
+	}
 
 
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		std::cout << i << ": " << govno[i] << std::endl;
 	}
-	 
-	std::cout << govno.Size();
+	//Array<int> govno;
+	//for (int i = 1; i < 15; i++)
+	//{
+	//	govno.Insert(i);
+	//}
+	//int a = 228;
+	//govno.Insert(25, a);
+	//govno.Insert(20, ++a);
+	//govno.Insert(21, ++a);
+	//govno.Insert(22, ++a);
+	//govno.Insert(23, ++a);
+	//govno.Insert(24, ++a);
+	//govno.Insert(24, ++a);
+	//govno.Insert(++a);
+	//govno.Insert(27, ++a);
+	//govno.Insert(127, ++a);
+	//govno.Insert(++a);
+	//for (int i = 0; i < 256; i++)
+	//{
+	//	std::cout << i << ": " << govno[i] << std::endl;
+	//}
+	//govno.Remove(20);
+	//for (int i = 0; i < 256; i++)
+	//{
+	//	std::cout << i << ": " << govno[i] << std::endl;
+	//}
+
+
 
 }
