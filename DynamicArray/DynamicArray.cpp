@@ -6,7 +6,7 @@ class Array final
 private:
 	int capacity_ = 8;
 	int last_el_index_ = -1;
-	int size = 0;
+	int size_ = 0;
 	T* arr_;
 public:
 	class Iterator
@@ -139,6 +139,31 @@ public:
 		free(arr_);
 	}
 
+	Array(const Array& obj)
+	{
+		capacity_ = obj.capacity_;
+		last_el_index_ = obj.last_el_index_;
+		size_ = obj.size_;
+		arr_ = static_cast<T*>(malloc(sizeof(T) * capacity_));
+		for (int i = 0; i < capacity_; i++)
+		{
+			arr_[i] = obj.arr_[i];
+		}
+	}
+
+	Array(Array&& obj) noexcept
+	{
+		capacity_ = obj.capacity_;
+		last_el_index_ = obj.last_el_index_;
+		size_ = obj.size_;
+		arr_ = obj.arr_;
+
+		obj.capacity_ = 0;
+		obj.last_el_index_ = 0;;
+		obj.size_ = 0;
+		obj.arr_ = nullptr;
+	}
+
 	void Resize(bool is_upsize, int target_index)
 	{
 		int tmp_capacity;
@@ -174,14 +199,14 @@ public:
 		capacity_ = tmp_capacity;
 	}
 
-	int Insert(T& value)
+	int Insert(const T& value)
 	{
 		if (last_el_index_ == capacity_ - 1)
 		{
 			Resize(true, last_el_index_ + 1);
 		}
 		arr_[++last_el_index_] = value;
-		size++;
+		size_++;
 		return last_el_index_;
 	}
 
@@ -222,7 +247,7 @@ public:
 		}
 		last_el_index_ = first_null_index;
 		//arr_[index] = value;
-		size++;
+		size_++;
 		return index;
 	}
 
@@ -254,7 +279,7 @@ public:
 				last_el_index_ = -1;
 			}
 		}
-		size--;
+		size_--;
 	}
 
 	T& operator[](int index)
@@ -264,7 +289,7 @@ public:
 
 	int Size() const
 	{
-		return size;
+		return size_;
 	}
 
 	Iterator iterator()
@@ -281,64 +306,66 @@ public:
 
 int main()
 {
-	Array<int> govno;
+	Array<int> tmpar;
+	tmpar[0] = 1;
+	tmpar[1] = 2;
+	for (int i = 0; i < 8; i++)
+	{
+		std::cout << i << ": " << tmpar[i] << std::endl;
+	}
+
+
+
+	Array<int> arr1;
 	int a = 0;
-	govno.Insert(++a);
-	govno.Insert(++a);
-	govno.Insert(++a);
-	govno.Insert(++a);
-	govno.Insert(++a);
-	govno.Insert(7, ++a);
-	govno.Remove(4);
-
-
-	for (auto it = govno.iterator(); it.hasNext(); it.Next())
+	arr1.Insert(++a);
+	arr1.Insert(++a);
+	arr1.Insert(++a);
+	arr1.Insert(++a);
+	arr1.Insert(++a);
+	arr1.Insert(7, ++a);
+	arr1.Remove(4);
+	for (auto it = arr1.iterator(); it.hasNext(); it.Next())
 	{
 		it.Set(a);
 		std::cout << it.Get() << std::endl;
 	}
 
-
 	for (int i = 0; i < 8; i++)
 	{
-		std::cout << i << ": " << govno[i] << std::endl;
+		std::cout << i << ": " << arr1[i] << std::endl;
 	}
 
-	int asd = 5;
-	int* das = &asd;
-	*das = 6;
-	int** ddads = &das;
-	**ddads = 7;
+	Array<int> arr2 = arr1;
+	arr2[0] = 5;
+	arr2[1] = 5;
+	arr2[2] = 5;
+	arr2[3] = 5;
+	arr2[4] = 5;
+	std::cout << std::endl;
+	for (int i = 0; i < 8; i++)
+	{
+		std::cout << i << ": " << arr1[i] << std::endl;
+	}
+	std::cout << std::endl;
+	for (int i = 0; i < 8; i++)
+	{
+		std::cout << i << ": " << arr2[i] << std::endl;
+	}
+	std::cout << std::endl;
+	std::cout << std::endl;
+
+	arr1.~Array();
+	for (int i = 0; i < 8; i++)
+	{
+		std::cout << i << ": " << arr1[i] << std::endl;
+	}
+	std::cout << std::endl;
+	for (int i = 0; i < 8; i++)
+	{
+		std::cout << i << ": " << arr2[i] << std::endl;
+	}
 	 
-	
-	std::cout << "dermo";
-	//Array<int> govno;
-	//for (int i = 1; i < 15; i++)
-	//{
-	//	govno.Insert(i);
-	//}
-	//int a = 228;
-	//govno.Insert(25, a);
-	//govno.Insert(20, ++a);
-	//govno.Insert(21, ++a);
-	//govno.Insert(22, ++a);
-	//govno.Insert(23, ++a);
-	//govno.Insert(24, ++a);
-	//govno.Insert(24, ++a);
-	//govno.Insert(++a);
-	//govno.Insert(27, ++a);
-	//govno.Insert(127, ++a);
-	//govno.Insert(++a);
-	//for (int i = 0; i < 256; i++)
-	//{
-	//	std::cout << i << ": " << govno[i] << std::endl;
-	//}
-	//govno.Remove(20);
-	//for (int i = 0; i < 256; i++)
-	//{
-	//	std::cout << i << ": " << govno[i] << std::endl;
-	//}
-
-
-
+	Array<int> adsdd = std::move(arr2);
+	arr2.~Array(); 
 }
