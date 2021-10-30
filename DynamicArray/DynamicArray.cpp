@@ -7,7 +7,7 @@ private:
 	int capacity_ = 8;
 	int last_el_index_ = -1;
 	int size_ = 0;
-	T* arr_;
+	T** arr_;
 public:
 	class Iterator
 	{
@@ -25,7 +25,7 @@ public:
 			{
 				for (int i = 0; i < parent_->capacity_; i++)
 				{
-					if (parent_->arr_[i] != NULL)
+					if (parent_->arr_[i] != nullptr)
 					{
 						index = i;
 						return;
@@ -36,7 +36,7 @@ public:
 			{
 				for (int i = parent_->capacity_ - 1; i >= 0; --i)
 				{
-					if (parent_->arr_[i] != NULL)
+					if (parent_->arr_[i] != nullptr)
 					{
 						index = i;
 						return;
@@ -48,11 +48,11 @@ public:
 
 		const T& Get() const
 		{ // current value in array
-			if (index == -1)
-			{
-				return NULL;
-			}
-			return parent_->arr_[index];
+			//if (index == -1)
+			//{
+			//	return nullptr;
+			//}
+			return *(parent_->arr_[index]);
 		}
 
 		void Set(const T& value)
@@ -61,7 +61,8 @@ public:
 			{
 				return;
 			}
-			parent_->arr_[index] = value;
+
+			*(parent_->arr_[index]) = value;
 		}
 
 		void Next()
@@ -74,7 +75,7 @@ public:
 			{
 				for (int i = index + 1; i < parent_->capacity_; i++)
 				{
-					if (parent_->arr_[i] != NULL)
+					if (parent_->arr_[i] != nullptr)
 					{
 						index = i;
 						return;
@@ -86,7 +87,7 @@ public:
 			{
 				for (int i = index - 1; i >= 0; i--)
 				{
-					if (parent_->arr_[i] != NULL)
+					if (parent_->arr_[i] != nullptr)
 					{
 						index = i;
 						return;
@@ -104,20 +105,20 @@ public:
 
 	Array()
 	{
-		arr_ = static_cast<T*>(malloc(sizeof(T) * capacity_));
+		arr_ = static_cast<T**>(malloc(sizeof(T*) * capacity_));
 		for (int i = 0; i < capacity_; i++)
 		{
-			arr_[i] = NULL;
+			arr_[i] = nullptr;
 		}
 	}
 
 	Array(int capacity)
 	{
 		capacity_ = capacity;
-		arr_ = static_cast<T*>(malloc(sizeof(T) * capacity_));
+		arr_ = static_cast<T**>(malloc(sizeof(T*) * capacity_));
 		for (int i = 0; i < capacity_; i++)
 		{
-			arr_[i] = NULL;
+			arr_[i] = nullptr;
 		}
 	}
 
@@ -130,24 +131,31 @@ public:
 	{
 		for (int i = 0; i < capacity_; i++)
 		{
-			arr_[i].~T();
-			/*if (arr_[i] != NULL)
+			//arr_[i]->~T();
+			if (arr_[i] != nullptr)
 			{
-				arr_[i].~T();
-			}*/
+				arr_[i]->~T();
+			}
 		}
 		free(arr_);
 	}
 
+	/// <summary>
+	///  CHECK CHECK CHECK CHECK CHECK CHECK CHECK CHECK 
+	/// </summary>
+	/// <param name="obj"></param>
 	Array(const Array& obj)
 	{
 		capacity_ = obj.capacity_;
 		last_el_index_ = obj.last_el_index_;
 		size_ = obj.size_;
-		arr_ = static_cast<T*>(malloc(sizeof(T) * capacity_));
+		arr_ = static_cast<T**>(malloc(sizeof(T*) * capacity_));
+
 		for (int i = 0; i < capacity_; i++)
 		{
-			arr_[i] = obj.arr_[i];
+			T* tmp;
+			*tmp = *(obj.arr_[i]);
+			arr_[i] = tmp;
 		}
 	}
 
@@ -181,20 +189,24 @@ public:
 			tmp_capacity = capacity_ / 2;
 		}
 
-		T* tmp = static_cast<T*>(malloc(sizeof(T) * tmp_capacity));
+		T** tmp = static_cast<T**>(malloc(sizeof(T*) * tmp_capacity));
 
 		int border_index = is_upsize ? capacity_ : tmp_capacity;
 		for (int i = 0; i < border_index; i++)
 		{
 			tmp[i] = arr_[i];
+			arr_[i] = nullptr;
 		}
 
 		for (int i = border_index; i < tmp_capacity; i++)
 		{
-			tmp[i] = NULL;
+			tmp[i] = nullptr;
 		}
+		auto as = tmp[0];
 
 		FreeArray();
+		as = tmp[0];
+
 		arr_ = tmp;
 		capacity_ = tmp_capacity;
 	}
@@ -205,7 +217,9 @@ public:
 		{
 			Resize(true, last_el_index_ + 1);
 		}
-		arr_[++last_el_index_] = value;
+		T* tmp = new T;
+		*tmp = value;
+		(arr_[++last_el_index_]) = tmp;
 		size_++;
 		return last_el_index_;
 	}
@@ -218,7 +232,7 @@ public:
 		int first_null_index = 0;
 		for (int i = index; i < capacity_; i++)
 		{
-			if (arr_[i] == NULL)
+			if (arr_[i] == nullptr)
 			{
 				no_nulls_after_index = false;
 				first_null_index = i;
@@ -237,8 +251,9 @@ public:
 			first_null_index = last_el_index_ + 1;
 		}
 
-		T previous_value = value;
-		T tmp_value;
+		T* previous_value = new T;
+		*previous_value = value;
+		T* tmp_value;
 		for (int i = index; i <= first_null_index; i++)
 		{
 			tmp_value = arr_[i];
@@ -253,13 +268,13 @@ public:
 
 	void Remove(int index)
 	{
-		if (index > last_el_index_ || index < 0 || arr_[index] == NULL)
+		if (index > last_el_index_ || index < 0 || arr_[index] == nullptr)
 		{
 			return;
 		}
 
-		T previous_value = NULL;
-		T tmp_value;
+		T* previous_value = nullptr;
+		T* tmp_value;
 		for (int i = last_el_index_; i >= index; i--)
 		{
 			tmp_value = arr_[i];
@@ -269,12 +284,12 @@ public:
 
 		for (int i = last_el_index_ - 1; i >= 0; i--)
 		{
-			if (arr_[i] != NULL)
+			if (arr_[i] != nullptr)
 			{
 				last_el_index_ = i;
 				break;
 			}
-			if (i == 0 && arr_[i] == NULL)
+			if (i == 0 && arr_[i] == nullptr)
 			{
 				last_el_index_ = -1;
 			}
@@ -284,7 +299,7 @@ public:
 
 	T& operator[](int index)
 	{
-		return arr_[index];
+		return *(arr_[index]);
 	}
 
 	int Size() const
@@ -304,68 +319,69 @@ public:
 };
 
 
+class A
+{
+public:
+
+	int a;
+	A()
+	{
+		a = 5;
+	}
+};
+
 int main()
 {
-	Array<int> tmpar;
-	tmpar[0] = 1;
-	tmpar[1] = 2;
-	for (int i = 0; i < 8; i++)
-	{
-		std::cout << i << ": " << tmpar[i] << std::endl;
-	}
-
-
-
 	Array<int> arr1;
 	int a = 0;
-	arr1.Insert(++a);
-	arr1.Insert(++a);
-	arr1.Insert(++a);
-	arr1.Insert(++a);
-	arr1.Insert(++a);
+	for (int i = 0; i < 32; i++)
+	{
+		arr1.Insert(++a);
+	}
 	arr1.Insert(7, ++a);
-	arr1.Remove(4);
 	for (auto it = arr1.iterator(); it.hasNext(); it.Next())
 	{
-		it.Set(a);
+		//it.Set(++a);
+		std::cout << it.Get() << std::endl;
+	}
+	arr1.Remove(7);
+	for (auto it = arr1.iterator(); it.hasNext(); it.Next())
+	{
+		it.Set(it.Get() * 2);
 		std::cout << it.Get() << std::endl;
 	}
 
-	for (int i = 0; i < 8; i++)
-	{
-		std::cout << i << ": " << arr1[i] << std::endl;
-	}
 
-	Array<int> arr2 = arr1;
-	arr2[0] = 5;
-	arr2[1] = 5;
-	arr2[2] = 5;
-	arr2[3] = 5;
-	arr2[4] = 5;
-	std::cout << std::endl;
-	for (int i = 0; i < 8; i++)
-	{
-		std::cout << i << ": " << arr1[i] << std::endl;
-	}
-	std::cout << std::endl;
-	for (int i = 0; i < 8; i++)
-	{
-		std::cout << i << ": " << arr2[i] << std::endl;
-	}
-	std::cout << std::endl;
-	std::cout << std::endl;
 
-	arr1.~Array();
+
+	Array<std::string> arrs;
+	for (int i = 0; i < 30; i++)
+	{
+		arrs.Insert("asdd"/*std::string(i+1, 'a')*/);
+	}
+	arrs.Insert("asdd");
+	arrs[0] = "456123";
+	for (auto it = arrs.iterator(); it.hasNext(); it.Next())
+	{
+		std::cout << it.Get() << std::endl;
+	}
+	std::cout << arrs.Size() << std::endl;
+
+
+
+
+
+	Array<A> aarr;
 	for (int i = 0; i < 8; i++)
 	{
-		std::cout << i << ": " << arr1[i] << std::endl;
+		A aa;
+		aarr.Insert(aa);
 	}
-	std::cout << std::endl;
-	for (int i = 0; i < 8; i++)
+	A aa;
+	aarr.Insert(aa);
+	std::cout << aarr.Size() << std::endl;
+	for (auto it = aarr.iterator(); it.hasNext(); it.Next())
 	{
-		std::cout << i << ": " << arr2[i] << std::endl;
-	}
-	 
-	Array<int> adsdd = std::move(arr2);
-	arr2.~Array(); 
+		std::cout << it.Get().a << std::endl;
+	} 
 }
