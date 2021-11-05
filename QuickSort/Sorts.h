@@ -2,7 +2,7 @@
 
 #include <stack>
 
-#define INSERTION_ELEMENTS 10
+#define INSERTION_ELEMENTS 2
 template<typename T>
 void swap(T* a, T* b)
 {
@@ -34,11 +34,11 @@ void InsertionSort(T* first, T* last, Compare comp)
 	if (last == first)
 	{
 		return;
-	} 
+	}
 	for (int i = 1; i <= last - first; i++)
 	{
 		for (int j = i; j > 0; j--)
-		{ 
+		{
 			if (comp(*(first + j - 1), *(first + j)))
 			{
 				break;
@@ -47,7 +47,7 @@ void InsertionSort(T* first, T* last, Compare comp)
 		}
 	}
 
-} 
+}
 
 template<typename T, typename Compare>
 T* Partition(T* first, T* pivot_element, T* last, Compare comp)
@@ -77,62 +77,27 @@ T* Partition(T* first, T* pivot_element, T* last, Compare comp)
 template<typename T, typename Compare>
 void QSort(T* first, T* last, Compare comp)
 {
-	if (first == last) return; // if array has only 1 element
-	if (last - first > INSERTION_ELEMENTS - 1)
+	while (true)
 	{
+		if (first == last) return; // if array has only 1 element
+		if (!(last - first > INSERTION_ELEMENTS - 1))
+		{
+			InsertionSort(first, last, comp);
+			return;
+		}
 		T* pivot_element = Partition(first, (first + (last - first) / 2), last, comp);
-		T* iter_first;
-		T* iter_last;
 		if (pivot_element + 1 == last && pivot_element - 1 == first) return;
 		if (pivot_element - first <= last - pivot_element)
 		{
 			if (first != pivot_element - 1)
 				QSort(first, pivot_element - 1, comp);
-			iter_first = pivot_element + 1;
-			iter_last = last;
+			first = pivot_element + 1;
 		}
 		else
 		{
 			if (pivot_element + 1 != last)
 				QSort(pivot_element + 1, last, comp);
-			iter_first = first;
-			iter_last = pivot_element - 1;
+			last = pivot_element - 1;
 		}
-
-		//iterative qsort goes here
-		std::stack<T*> stack;
-		stack.push(iter_first);
-		stack.push(iter_last);
-		while (!stack.empty())
-		{
-			iter_last = stack.top(); stack.pop();
-			iter_first = stack.top(); stack.pop();
-
-			if (iter_last - iter_first > INSERTION_ELEMENTS - 1)
-			{
-				T* iter_pivot = Partition(iter_first, (iter_first + (iter_last - iter_first) / 2), iter_last, comp);
-				if (iter_pivot - iter_first > 1)
-				{
-					stack.push(iter_first);
-					stack.push(iter_pivot - 1);
-				}
-				if (iter_last - iter_pivot > 1)
-				{
-					stack.push(iter_pivot + 1);
-					stack.push(iter_last);
-				}
-			}
-			else
-			{
-				InsertionSort(iter_first, iter_last, comp);
-			}
-		}
-	}
-	else
-	{
-		InsertionSort(first, last, comp);
 	}
 }
-
-//template <typename T>
-//bool comp(const T& a, const T& b);
