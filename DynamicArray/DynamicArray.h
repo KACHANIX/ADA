@@ -31,7 +31,7 @@ public:
 	// Free memory
 	void FreeArray()
 	{
-		for (int i = 0; i < capacity_; i++)
+		for (int i = 0; i < size_; i++)
 		{
 			arr_[i].~T();
 		}
