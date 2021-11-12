@@ -8,7 +8,7 @@ int main()
 	int iterations = 100000;
 	long long  microseconds = 0;
 
-	const int arr_len = 1000;
+	const int arr_len = 55;
 	int a[arr_len];
 
 	for (int i = 0; i < iterations; i++)

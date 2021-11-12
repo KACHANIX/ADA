@@ -2,7 +2,9 @@
 
 #include <stack>
 
-#define INSERTION_ELEMENTS 2
+//#define INSERTION_ELEMENTS 2
+int INSERTION_ELEMENTS = 2;
+
 template<typename T>
 void swap(T* a, T* b)
 {
@@ -77,10 +79,14 @@ T* Partition(T* first, T* pivot_element, T* last, Compare comp)
 template<typename T, typename Compare>
 void QSort(T* first, T* last, Compare comp)
 {
+	//if (INSERTION_ELEMENTS == 2)
+	//{
+	//	INSERTION_ELEMENTS = (last - first + 1);
+	//}
 	while (true)
 	{
 		if (first == last) return; // if array has only 1 element
-		if (!(last - first > INSERTION_ELEMENTS - 1))
+		if (!(last - first >= INSERTION_ELEMENTS - 1))
 		{
 			InsertionSort(first, last, comp);
 			return;
