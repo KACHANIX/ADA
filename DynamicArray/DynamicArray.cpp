@@ -7,10 +7,14 @@ class A
 {
 public:
 
-	int a;
+	int a_;
 	A()
 	{
-		a = 5;
+		a_ = 5;
+	}
+	A(int asd)
+	{
+		a_ = asd;
 	}
 	~A()
 	{
@@ -64,9 +68,12 @@ int main()
 	// Check copy constructor
 	Array<int> copied = arr;
 	copied.Remove(0);
+	copied[0] = 456;
 	std::cout << std::endl << std::endl;
-	std::cout << arr[0] << " - " << copied[0];
+	std::cout << arr[1] << " - " << copied[0];
 
+	// Check move constructor
+	Array<int> moved = std::move(copied);
 
 
 	// Strings array
@@ -93,5 +100,27 @@ int main()
 	for (auto iterator = str_arr.reversedIterator(); iterator.hasNext(); iterator.next())
 	{
 		std::cout << iterator.get() << std::endl;
-	} 
+	}
+
+
+	// Check A
+	std::cout  << std::endl;
+
+	Array<A> A_arr;
+	A a1(1);
+	A a2(2);
+	A_arr.Insert(a1);
+	A_arr.Insert(0,a2);
+	A_arr.Insert(a1);
+	A_arr.Insert(a1);
+	A_arr.Insert(a1);
+	A_arr.Insert(a1);
+	A_arr.Insert(a1);
+	A_arr.Insert(a1);
+	A_arr.Insert(a1);
+	A_arr.Insert(a1);
+	for (auto iterator = A_arr.iterator();iterator.hasNext();iterator.next())
+	{
+		std::cout << iterator.get().a_ << std::endl;
+	}
 }

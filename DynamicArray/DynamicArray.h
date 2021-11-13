@@ -7,7 +7,6 @@
 template <typename T>
 class Array final
 {
-
 private:
 	int capacity_;
 	int size_;
@@ -22,7 +21,7 @@ public:
 		size_ = 0;
 	}
 
-	// Desctructor
+	// Destructor
 	~Array()
 	{
 		FreeArray();
@@ -34,9 +33,7 @@ public:
 		for (int i = 0; i < size_; i++)
 		{
 			arr_[i].~T();
-		}
-		//size_ = 0;
-		//capacity_ = 0;
+		} 
 		free(arr_);
 	}
 
@@ -45,31 +42,21 @@ public:
 	{
 		for (int i = 0; i < arr.size_; i++)
 		{
-			new (arr_ + i) T((arr[i])); // ref
+			new (arr_ + i) T((arr[i])); 
 			size_++;
 		}
 	}
 
 	// Move constructor
-	Array(Array&& arr) : Array(arr.capacity_)
+	Array(Array&& arr)
 	{
-		if (std::is_move_constructible_v<T>)
-		{
-			for (int i = 0; i < arr.size_; i++)
-			{
-				new (arr_ + i) T(std::move(arr[i]));
-				size_++;
-			}
-		}
-		else
-		{
-			for (int i = 0; i < arr.size_; i++)
-			{
-				new (arr_ + i) T(std::ref(arr[i])); // ref
-				size_++;
-			}
-		}
-		arr.FreeArray();
+		arr_ = arr.arr_;
+		size_ = arr.size_;
+		capacity_ = arr.capacity_;
+
+		arr.arr_ = nullptr;
+		arr.size_ = 0;
+		arr.capacity_ = 0;
 	}
 
 	// Upsize twice
@@ -89,7 +76,7 @@ public:
 		{
 			for (int i = 0; i < size_; i++)
 			{
-				new (tmp + i) T(std::ref(arr_[i])); // ref
+				new (tmp + i) T(arr_[i]); 
 			}
 		}
 		FreeArray();
@@ -133,7 +120,7 @@ public:
 		{
 			for (int i = size_; i > index; i--)
 			{
-				new (arr_ + i) T(std::ref(arr_[i - 1])); // ref
+				new (arr_ + i) T(arr_[i - 1]);
 				arr_[i - 1].~T();
 			}
 		}
@@ -164,7 +151,7 @@ public:
 		{
 			for (int i = index; i < size_ - 1; i++)
 			{
-				new (arr_ + i) T(std::ref(arr_[i + 1]));
+				new (arr_ + i) T(arr_[i + 1]);
 				arr_[i + 1].~T();
 			}
 		}
@@ -236,7 +223,7 @@ public:
 			else
 			{
 				current_index_--;
-				if (current_index_ ==-1)
+				if (current_index_ == -1)
 					is_last_ = true;
 			}
 		}

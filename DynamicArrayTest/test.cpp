@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "../DynamicArray/Array.h"
+#include "../DynamicArray/DynamicArray.h"
 
 TEST(CorrectPlacement, SimpleInsertion) {
 	Array<int> arr;
@@ -22,12 +22,11 @@ TEST(CorrectPlacement, InsertionByIndex)
 		arr.Insert(0, 8 - i);
 	}
 
-
 	int test_var = arr[0];
-	for (auto it = arr.iterator(); it.hasNext(); it.Next())
+	for (auto it = arr.iterator(); it.hasNext(); it.next())
 	{
-		ASSERT_LE(test_var, it.Get());
-		test_var = it.Get();
+		ASSERT_LE(test_var, it.get());
+		test_var = it.get();
 	}
 }
 
@@ -41,10 +40,10 @@ TEST(CorrectIterator, ForwardIterator)
 	}
 
 	int test_var = 0;
-	for (auto it = arr.iterator(); it.hasNext(); it.Next())
+	for (auto it = arr.iterator(); it.hasNext(); it.next())
 	{
-		ASSERT_LT(test_var, it.Get());
-		test_var = it.Get();
+		ASSERT_LT(test_var, it.get());
+		test_var = it.get();
 	}
 }
 TEST(CorrectIterator, ReverseIterator)
@@ -57,10 +56,10 @@ TEST(CorrectIterator, ReverseIterator)
 	}
 
 	int test_var = 9;
-	for (auto it = arr.reverseIterator(); it.hasNext(); it.Next())
+	for (auto it = arr.reversedIterator(); it.hasNext(); it.next())
 	{
-		ASSERT_GT(test_var, it.Get());
-		test_var = it.Get();
+		ASSERT_GT(test_var, it.get());
+		test_var = it.get();
 	}
 }
 TEST(CorrectIterator, SetThroughIterator)
@@ -73,14 +72,14 @@ TEST(CorrectIterator, SetThroughIterator)
 	}
 
 	int set_six = 6;
-	for (auto it = arr.iterator(); it.hasNext(); it.Next())
+	for (auto it = arr.iterator(); it.hasNext(); it.next())
 	{
-		it.Set(set_six);
+		it.set(set_six);
 	}
 
-	for (auto it = arr.iterator(); it.hasNext(); it.Next())
+	for (auto it = arr.iterator(); it.hasNext(); it.next())
 	{
-		ASSERT_EQ(set_six, it.Get());
+		ASSERT_EQ(set_six, it.get());
 	}
 }
 
@@ -95,7 +94,7 @@ TEST(CorrectResize, Upsize)
 	}
 	arr.Insert(++a);
 
-	ASSERT_EQ(init_capacity + 1, arr.Size());
+	ASSERT_EQ(init_capacity + 1, arr.size());
 }
 
 TEST(CorrectRemove, RemoveAffectSize)
@@ -106,9 +105,9 @@ TEST(CorrectRemove, RemoveAffectSize)
 	{
 		arr.Insert(++a);
 	}
-	int old_size = arr.Size();
+	int old_size = arr.size();
 	arr.Remove(7);
-	int new_size = arr.Size();
+	int new_size = arr.size();
 
 	ASSERT_NE(old_size, new_size);
 }
