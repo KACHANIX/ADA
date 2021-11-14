@@ -120,5 +120,35 @@ TEST(CorrectRemove, RemoveExecutesMoveleft)
 		arr.Insert(++a);
 	}
 	arr.Remove(6);
-	ASSERT_EQ(arr[6], 8);
+	ASSERT_EQ(arr[6], a);
+}
+
+TEST(STRINGS, StringResizeCorrectly)
+{
+	std::cout << std::endl << std::endl << std::endl;
+	Array<std::string> str_arr;
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	str_arr.Insert("a");
+	int counter = 0;
+	for (auto iterator = str_arr.reversedIterator(); iterator.hasNext(); iterator.next())
+	{
+		counter ++;
+	}
+	ASSERT_EQ(counter, 18);
 }

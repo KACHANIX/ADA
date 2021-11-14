@@ -33,7 +33,7 @@ public:
 		for (int i = 0; i < size_; i++)
 		{
 			arr_[i].~T();
-		} 
+		}
 		free(arr_);
 	}
 
@@ -42,7 +42,7 @@ public:
 	{
 		for (int i = 0; i < arr.size_; i++)
 		{
-			new (arr_ + i) T((arr[i])); 
+			new (arr_ + i) T((arr[i]));
 			size_++;
 		}
 	}
@@ -65,7 +65,7 @@ public:
 		capacity_ *= 2;
 		T* tmp = static_cast<T*>(malloc(sizeof(T) * capacity_));
 
-		if (std::is_move_constructible_v<T>)
+		if constexpr (std::is_move_constructible_v<T>)
 		{
 			for (int i = 0; i < size_; i++)
 			{
@@ -76,7 +76,7 @@ public:
 		{
 			for (int i = 0; i < size_; i++)
 			{
-				new (tmp + i) T(arr_[i]); 
+				new (tmp + i) T(arr_[i]);
 			}
 		}
 		FreeArray();
@@ -108,7 +108,7 @@ public:
 			Upsize();
 		}
 
-		if (std::is_move_constructible_v<T>)
+		if constexpr (std::is_move_constructible_v<T>)
 		{
 			for (int i = size_; i > index; i--)
 			{
@@ -120,7 +120,7 @@ public:
 		{
 			for (int i = size_; i > index; i--)
 			{
-				new (arr_ + i) T(arr_[i - 1]);
+				new (arr_ + i) T((arr_[i - 1]));
 				arr_[i - 1].~T();
 			}
 		}
@@ -139,7 +139,7 @@ public:
 
 		arr_[index].~T();
 		auto asd = arr_[index];
-		if (std::is_move_constructible_v<T>)
+		if constexpr (std::is_move_constructible_v<T>)
 		{
 			for (int i = index; i < size_ - 1; i++)
 			{
@@ -189,7 +189,7 @@ public:
 		{
 			parent_ = parent;
 			is_forward_ = is_forward;
-			is_last_ = parent_->size_ > 0 ? false : true;
+			is_last_ = parent_->size_ <= 0;
 			if (is_forward_)
 			{
 				current_index_ = 0;
