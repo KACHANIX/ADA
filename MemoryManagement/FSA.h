@@ -1,12 +1,8 @@
 #pragma once
 #include <cassert>
 #include <Windows.h>  
+#include <iostream> 
 #define DEBUG
-
-#ifdef DEBUG
-#include <iostream>
-#include <iomanip> 
-#endif
 
 class FSA
 {
@@ -80,17 +76,21 @@ public:
 	void* alloc() {
 		assert(state == State::Initialized);
 		auto cur_page = pages_;
-		while (cur_page && !(blocks_initiated_ < (CHUNK_SIZE - sizeof(Page)) / block_size_) && cur_page->fl_index != -1) cur_page = cur_page->next;
-		if (!cur_page) {
-			void* newChunk = VirtualAlloc(NULL, CHUNK_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+		while (cur_page && !(blocks_initiated_ < (CHUNK_SIZE - sizeof(Page)) / block_size_) && cur_page->fl_index != -1) 
+			cur_page = cur_page->next;
 
-			auto newPage = static_cast<Page*>(newChunk);
-			newPage->Init(static_cast<void*>(static_cast<char*>(newChunk) + sizeof(Page)), pages_);
-			pages_ = newPage;
+		// if it's full
+		if (!cur_page) {
+			void* new_chunk = VirtualAlloc(NULL, CHUNK_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+			auto new_page = static_cast<Page*>(new_chunk);
+			new_page->Init(static_cast<void*>(static_cast<char*>(new_chunk) + sizeof(Page)), pages_);
+			pages_ = new_page;
 			blocks_initiated_ = 0;
 			return alloc();
 		}
 
+		// if some memory was freed
 		if (cur_page->fl_index != -1) {
 			char* temp = static_cast<char*>(cur_page->chunk) + cur_page->fl_index * block_size_;
 			cur_page->fl_index = *reinterpret_cast<int*>(temp);
@@ -115,7 +115,6 @@ public:
 		int distance = static_cast<char*>(blockToFree) - static_cast<char*>(cur_page->chunk);
 		*static_cast<int*>(blockToFree) = cur_page->fl_index;
 		cur_page->fl_index = distance / block_size_;
-
 	}
 
 #ifdef DEBUG

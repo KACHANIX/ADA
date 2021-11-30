@@ -6,6 +6,7 @@ int main()
 	allocator.init();
 
 	auto pi = static_cast<int*>(allocator.alloc(sizeof(int)));
+	auto pi2 = static_cast<int*>(allocator.alloc(sizeof(int)));
 	auto pd = static_cast<double*>(allocator.alloc(sizeof(double)));
 	auto pa = static_cast<int*>(allocator.alloc(10 * sizeof(int)));
 	allocator.dumpStat();
@@ -13,11 +14,14 @@ int main()
 	allocator.free(pa);
 	allocator.free(pd);
 	allocator.free(pi);
+	allocator.free(pi2);
+	pi = static_cast<int*>(allocator.alloc(sizeof(int)));
+	allocator.free(pi);
 	allocator.destroy();
 
 
 	///////////
-	std::cout << std::endl << std::endl << std::endl; 
+	std::cout << std::endl << std::endl << std::endl;
 	allocator.init();
 
 	auto a = static_cast<char*>(allocator.alloc(7));
