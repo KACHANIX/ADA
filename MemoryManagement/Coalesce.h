@@ -6,16 +6,20 @@
 
 class CoalesceAllocator {
 private:
-	struct Page {
+	struct Page
+	{
 	public:
 		Page* next;
 		void* chunk;
 
-		Page(void* chunk, Page* next = nullptr) {
+		Page(void* chunk, Page* next = nullptr)
+		{
 			this->next = next;
 			this->chunk = chunk;
 		}
-		void Init(void* chunk, Page* next = nullptr) {
+
+		void Init(void* chunk, Page* next = nullptr)
+		{
 			this->next = next;
 			this->chunk = chunk;
 		}
@@ -26,7 +30,8 @@ private:
 		DataBlock* next;
 		DataBlock* prev;
 		size_t size;
-		DataBlock(size_t size) {
+		DataBlock(size_t size)
+		{
 			this->size = size;
 		}
 	};
@@ -50,7 +55,8 @@ private:
 #endif
 
 public:
-	CoalesceAllocator() {
+	CoalesceAllocator()
+	{
 		pages_ = nullptr;
 		engaged_blocks_ = 0;
 		engaged_size_ = 0;
@@ -65,7 +71,8 @@ public:
 	CoalesceAllocator(const CoalesceAllocator&) = delete;
 	CoalesceAllocator& operator=(const CoalesceAllocator&) = delete;
 
-	void init() {
+	void init()
+	{
 		void* newChunk = VirtualAlloc(NULL, BUFFER, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 		pages_ = static_cast<Page*>(newChunk);
 		pages_->Init(static_cast<void*>(static_cast<char*>(newChunk) + sizeof(Page)));
@@ -75,15 +82,18 @@ public:
 		free_list_->prev = nullptr;
 	}
 
-	void destroy() {
-		while (pages_) {
+	void destroy()
+	{
+		while (pages_) 
+		{
 			auto tmp = pages_;
 			pages_ = pages_->next;
 			VirtualFree(tmp, 0, MEM_RELEASE);
 		}
 	}
 
-	void* alloc(size_t size) {
+	void* alloc(size_t size)
+	{
 		size_t save_size = size;
 		size += sizeof(size_t);
 		size += (8 - size % 8);
@@ -91,8 +101,10 @@ public:
 		size = size < MIN_BYTES ? MIN_BYTES : size;
 
 		DataBlock* first = nullptr;
-		for (auto i = free_list_; i; i = i->next) {
-			if (i->size >= size) {
+		for (auto i = free_list_; i; i = i->next) 
+		{
+			if (i->size >= size) 
+			{
 				first = i;
 				break;
 			}
@@ -104,8 +116,9 @@ public:
 			{
 				size = first->size;
 			}
-			// 
-			if (first->size - size != 0) {
+			// if we need to cut the block
+			if (first->size - size != 0) 
+			{
 				auto rest = reinterpret_cast<DataBlock*>(reinterpret_cast<char*>(first) + size);
 				rest->next = first->next;
 				rest->prev = first->prev;
@@ -123,7 +136,8 @@ public:
 					free_list_ = rest;
 				}
 			}
-			else {
+			else 
+			{
 				if (first->next)
 				{
 					first->next->prev = first->prev;
@@ -142,7 +156,8 @@ public:
 			engaged_size_ += size;
 			return static_cast<void*>(mem);
 		}
-		else {
+		else 
+		{
 			void* newChunk = VirtualAlloc(NULL, BUFFER, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 			pages_ = static_cast<Page*>(newChunk);
 			auto temp = free_list_;
@@ -155,12 +170,14 @@ public:
 		}
 	}
 
-	void free(void* blockToFree) {
+	void free(void* blockToFree)
+	{
 		blockToFree = static_cast<void*>(static_cast<DataBlock*>(blockToFree) - 1);
 		size_t size = (static_cast<DataBlock*>(blockToFree))->size;
 		DataBlock* next = nullptr;
 		DataBlock* prev = nullptr;
-		for (auto i = free_list_; i; i = i->next) {
+		for (auto i = free_list_; i; i = i->next) 
+		{
 			if (reinterpret_cast<char*>(i) + i->size == static_cast<char*>(blockToFree))
 			{
 				prev = i;
@@ -171,9 +188,11 @@ public:
 			}
 		}
 
-		if (prev) {
+		if (prev) 
+		{
 			prev->size += size;
-			if (next) {
+			if (next) 
+			{
 				prev->size += size;
 				if (next->prev)
 				{
@@ -189,7 +208,8 @@ public:
 				}
 			}
 		}
-		else if (next) {
+		else if (next) 
+		{
 			static_cast<DataBlock*>(blockToFree)->next = next->next;
 			static_cast<DataBlock*>(blockToFree)->prev = next->prev;
 			static_cast<DataBlock*>(blockToFree)->size += next->size;
@@ -206,7 +226,8 @@ public:
 				free_list_ = static_cast<DataBlock*>(blockToFree);
 			}
 		}
-		else {
+		else 
+		{
 			static_cast<DataBlock*>(blockToFree)->next = free_list_;
 			static_cast<DataBlock*>(blockToFree)->prev = nullptr;
 			static_cast<DataBlock*>(blockToFree)->size += size;

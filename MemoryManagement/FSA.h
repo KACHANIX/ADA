@@ -7,18 +7,22 @@
 class FSA
 {
 private:
-	struct Page {
+	struct Page
+	{
 	public:
 		Page* next;
 		void* chunk;
 		int fl_index;
 
-		Page(void* chunk, Page* next = nullptr) {
+		Page(void* chunk, Page* next = nullptr)
+		{
 			this->next = next;
 			this->chunk = chunk;
 			fl_index = -1;
 		}
-		void Init(void* chunk, Page* next = nullptr) {
+
+		void Init(void* chunk, Page* next = nullptr)
+		{
 			this->next = next;
 			this->chunk = chunk;
 			fl_index = -1;
@@ -30,7 +34,6 @@ private:
 	static constexpr size_t MIN_BYTES = 16;
 	size_t CHUNK_SIZE = 4096;
 
-#ifndef NDEBUG
 	enum class State
 	{
 		NotInitialized,
@@ -38,10 +41,10 @@ private:
 		Destroyed
 	};
 	State state = State::NotInitialized;
-#endif
 
 public:
-	FSA() {
+	FSA()
+	{
 		block_size_ = 0;
 		blocks_initiated_ = 0;
 		pages_ = nullptr;
@@ -56,7 +59,8 @@ public:
 	FSA(const FSA&) = delete;
 	FSA& operator=(const FSA&) = delete;
 
-	void init(size_t initialSize = MIN_BYTES) {
+	void init(size_t initialSize = MIN_BYTES)
+	{
 		block_size_ = initialSize;
 		void* new_chunk = VirtualAlloc(NULL, CHUNK_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 		pages_ = static_cast<Page*>(new_chunk);
@@ -64,8 +68,10 @@ public:
 		state = State::Initialized;
 	}
 
-	void destroy() {
-		while (pages_) {
+	void destroy()
+	{
+		while (pages_)
+		{
 			auto tmp = pages_;
 			pages_ = pages_->next;
 			VirtualFree(tmp, 0, MEM_RELEASE);
@@ -73,14 +79,18 @@ public:
 		blocks_initiated_ = 0;
 	}
 
-	void* alloc() {
+	void* alloc()
+	{
 		assert(state == State::Initialized);
 		auto cur_page = pages_;
-		while (cur_page && !(blocks_initiated_ < (CHUNK_SIZE - sizeof(Page)) / block_size_) && cur_page->fl_index != -1) 
+		while (cur_page && !(blocks_initiated_ < (CHUNK_SIZE - sizeof(Page)) / block_size_) && cur_page->fl_index != -1)
+		{
 			cur_page = cur_page->next;
+		}
 
 		// if it's full
-		if (!cur_page) {
+		if (!cur_page)
+		{
 			void* new_chunk = VirtualAlloc(NULL, CHUNK_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
 			auto new_page = static_cast<Page*>(new_chunk);
@@ -91,23 +101,27 @@ public:
 		}
 
 		// if some memory was freed
-		if (cur_page->fl_index != -1) {
+		if (cur_page->fl_index != -1)
+		{
 			char* temp = static_cast<char*>(cur_page->chunk) + cur_page->fl_index * block_size_;
 			cur_page->fl_index = *reinterpret_cast<int*>(temp);
 			return static_cast<void*>(temp);
 		}
-		else {
+		else
+		{
 			char* temp = static_cast<char*>(cur_page->chunk) + blocks_initiated_ * block_size_;
 			blocks_initiated_++;
 			return static_cast<void*>(temp);
 		}
 	}
 
-	void free(void* blockToFree) {
+	void free(void* blockToFree)
+	{
 		assert(state == State::Initialized);
 		auto cur_page = pages_;
 		while (cur_page && !(static_cast<char*>(blockToFree) >= static_cast<char*>(cur_page->chunk)
-			&& static_cast<char*>(cur_page->chunk) + CHUNK_SIZE - sizeof(Page) > static_cast<char*>(blockToFree))) {
+			&& static_cast<char*>(cur_page->chunk) + CHUNK_SIZE - sizeof(Page) > static_cast<char*>(blockToFree))) 
+		{
 			cur_page = cur_page->next;
 		}
 
@@ -118,7 +132,8 @@ public:
 	}
 
 #ifdef DEBUG
-	void dumpStat() const {
+	void dumpStat() const
+	{
 		std::cout << "FSA " << block_size_ << " bytes:" << std::endl;
 		std::cout << "\tFree: ";
 		int free_count = CHUNK_SIZE / block_size_ - blocks_initiated_;
