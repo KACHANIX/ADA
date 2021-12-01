@@ -165,7 +165,7 @@ public:
 		while (stat_blocks) {
 			if (stat_blocks->size >= 10 * 1024 * 1024)
 			{
-				std::cout << "OC  block:" << std::endl;
+				std::cout << "OS  block:" << std::endl;
 				std::cout << "\tEngaged: " << stat_blocks->size << std::endl;
 			}
 			stat_blocks = stat_blocks->next;
